@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Show unpushed commits for the current Git branch
-# Optional: accepts a remote name (defaults to 'origin')
+# GitHub CLI Extension: gh-unpushed
+# Shows unpushed commits for the current branch compared to a remote (default: origin)
 
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   echo "Usage: gh unpushed [remote]"
-  echo "Shows unpushed commits for the current branch compared to the specified remote (default: origin)."
+  echo "Shows unpushed commits for the current Git branch compared to the specified remote (default: origin)."
   exit 0
 fi
 
@@ -18,20 +18,20 @@ if [[ -z "$branch" ]]; then
   exit 1
 fi
 
-# Check if the remote branch exists
 if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
   echo "🚫 Remote branch '$remote/$branch' doesn't exist!"
   exit 1
 fi
 
-# Get unpushed commits
-unpushed=$(git log "$remote/$branch"..HEAD --oneline)
+unpushed=$(git log "$remote/$branch"..HEAD \
+  --pretty=format:"• %C(yellow)%h%Creset  %Cgreen%ad%Creset  %s" \
+  --date=format:'%Y-%m-%d %H:%M:%S')
 
 if [[ -z "$unpushed" ]]; then
   echo "✅ No unpushed commits on '$branch' compared to '$remote'."
 else
   echo "🚀 Unpushed commits on '$branch' (not yet pushed to '$remote/$branch'):"
+  echo ""
   echo "$unpushed"
+  echo ""
 fi
-
-
