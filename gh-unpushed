@@ -1,16 +1,61 @@
 #!/usr/bin/env bash
 set -e
 
-# GitHub CLI Extension: gh-unpushed
-# Shows unpushed commits for the current branch compared to a remote (default: origin)
+CONFIG_FILE="${HOME}/.gh-unpushed-config"
 
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-  echo "Usage: gh unpushed [remote]"
-  echo "Shows unpushed commits for the current Git branch compared to the specified remote (default: origin)."
-  exit 0
+# Defaults
+remote="origin"
+
+# Read stored default remote if available
+if [[ -f "$CONFIG_FILE" ]]; then
+  stored_remote=$(cat "$CONFIG_FILE")
+  if [[ -n "$stored_remote" ]]; then
+    remote="$stored_remote"
+  fi
 fi
 
-remote=${1:-origin}
+# Argument parsing
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --remote|-r)
+      remote="$2"
+      shift 2
+      ;;
+    --set-remote|-sr)
+      if [[ -z "$2" ]]; then
+        echo "🚫 Please provide a remote name."
+        exit 1
+      fi
+      echo "$2" > "$CONFIG_FILE"
+      echo "✅ Default remote set to '$2'"
+      exit 0
+      ;;
+    --help|-h)
+      echo "Usage: gh unpushed [--remote <remote>] [--set-remote <remote>]"
+      echo ""
+      echo "Shows unpushed commits for the current Git branch compared to the specified remote."
+      echo "Defaults to 'origin', unless a different default is configured with --set-remote."
+      echo ""
+      echo "Flags:"
+      echo "  --remote, -r <remote>       Override the default remote for this run"
+      echo "  --set-remote, -sr <remote>  Set a new default remote for future runs"
+      echo "  --help, -h                  Show this help message"
+      exit 0
+      ;;
+    -*)
+      echo "🚫 Unknown option: $1"
+      echo "Use --help to see available options."
+      exit 1
+      ;;
+    *)
+      # Assume it's a positional remote
+      remote="$1"
+      shift
+      ;;
+  esac
+done
+
+# Check current branch
 branch=$(git branch --show-current)
 
 if [[ -z "$branch" ]]; then
@@ -23,6 +68,7 @@ if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
   exit 1
 fi
 
+# Get unpushed commits
 unpushed=$(git log "$remote/$branch"..HEAD \
   --pretty=format:"• %C(yellow)%h%Creset  %Cgreen%ad%Creset  %s" \
   --date=format:'%Y-%m-%d %H:%M:%S')
