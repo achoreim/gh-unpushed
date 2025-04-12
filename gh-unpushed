@@ -65,6 +65,9 @@ fi
 
 if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
   echo "🚫 Remote branch '$remote/$branch' doesn't exist!"
+  echo "💡 You may need to push this branch first:"
+  echo "    git push -u $remote $branch"
+  exit 1
   exit 1
 fi
 
