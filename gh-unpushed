@@ -43,16 +43,27 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     --help|-h)
-      echo "Usage: gh unpushed [--remote <remote>] [--set-remote <remote>]"
+      echo "gh-unpushed - Show unpushed commits on your current Git branch"
       echo ""
-      echo "Shows unpushed commits for the current Git branch compared to the specified remote."
-      echo "Defaults to 'origin', unless a different default is configured with --set-remote."
+      echo "Usage:"
+      echo "  gh unpushed [remote] [options]"
       echo ""
-      echo "Flags:"
-      echo "  --remote, -r <remote>       Override the default remote for this run"
-      echo "  --set-remote, -sr <remote>  Set a new default remote for future runs"
-      echo "  --help, -h                  Show this help message"
-      echo "  --version, -v               Show the version of this tool"
+      echo "Description:"
+      echo "  Displays local commits that haven't been pushed to the specified remote."
+      echo "  If no remote is specified, it uses the default (typically 'origin')."
+      echo ""
+      echo "Examples:"
+      echo "  gh unpushed                  # Check unpushed commits to default remote"
+      echo "  gh unpushed upstream         # Use a specific remote"
+      echo "  gh unpushed -r upstream      # Same as above using --remote"
+      echo "  gh unpushed -sr upstream     # Set 'upstream' as new default"
+      echo "  gh unpushed -v               # Show tool version"
+      echo ""
+      echo "Options:"
+      echo "  --remote, -r <remote>        Override the remote for this run"
+      echo "  --set-remote, -sr <remote>   Set a new default remote"
+      echo "  --version, -v                Show the version of this tool"
+      echo "  --help, -h                   Show this help message"
       exit 0
       ;;
     -*)
