@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
+# Load version from file
+VERSION_FILE="$(dirname "$0")/VERSION"
+if [[ -f "$VERSION_FILE" ]]; then
+  VERSION=$(cat "$VERSION_FILE")
+else
+  VERSION="unknown"
+fi
+
 CONFIG_FILE="${HOME}/.gh-unpushed-config"
 
 # Defaults
@@ -17,6 +25,10 @@ fi
 # Argument parsing
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --version|-v)
+      echo "$VERSION"
+      exit 0
+      ;;
     --remote|-r)
       remote="$2"
       shift 2
@@ -40,6 +52,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --remote, -r <remote>       Override the default remote for this run"
       echo "  --set-remote, -sr <remote>  Set a new default remote for future runs"
       echo "  --help, -h                  Show this help message"
+      echo "  --version, -v               Show the version of this tool"
       exit 0
       ;;
     -*)
@@ -67,7 +80,6 @@ if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
   echo "🚫 Remote branch '$remote/$branch' doesn't exist!"
   echo "💡 You may need to push this branch first:"
   echo "    git push -u $remote $branch"
-  exit 1
   exit 1
 fi
 
