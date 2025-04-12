@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
+# Load version from file
+VERSION_FILE="$(dirname "$0")/VERSION"
+if [[ -f "$VERSION_FILE" ]]; then
+  VERSION=$(cat "$VERSION_FILE")
+else
+  VERSION="unknown"
+fi
+
 CONFIG_FILE="${HOME}/.gh-unpushed-config"
 
 # Defaults
@@ -17,6 +25,10 @@ fi
 # Argument parsing
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --version|-v)
+      echo "$VERSION"
+      exit 0
+      ;;
     --remote|-r)
       remote="$2"
       shift 2
@@ -31,15 +43,27 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     --help|-h)
-      echo "Usage: gh unpushed [--remote <remote>] [--set-remote <remote>]"
+      echo "gh-unpushed - Show unpushed commits on your current Git branch"
       echo ""
-      echo "Shows unpushed commits for the current Git branch compared to the specified remote."
-      echo "Defaults to 'origin', unless a different default is configured with --set-remote."
+      echo "Usage:"
+      echo "  gh unpushed [remote] [options]"
       echo ""
-      echo "Flags:"
-      echo "  --remote, -r <remote>       Override the default remote for this run"
-      echo "  --set-remote, -sr <remote>  Set a new default remote for future runs"
-      echo "  --help, -h                  Show this help message"
+      echo "Description:"
+      echo "  Displays local commits that haven't been pushed to the specified remote."
+      echo "  If no remote is specified, it uses the default (typically 'origin')."
+      echo ""
+      echo "Examples:"
+      echo "  gh unpushed                  # Check unpushed commits to default remote"
+      echo "  gh unpushed upstream         # Use a specific remote"
+      echo "  gh unpushed -r upstream      # Same as above using --remote"
+      echo "  gh unpushed -sr upstream     # Set 'upstream' as new default"
+      echo "  gh unpushed -v               # Show tool version"
+      echo ""
+      echo "Options:"
+      echo "  --remote, -r <remote>        Override the remote for this run"
+      echo "  --set-remote, -sr <remote>   Set a new default remote"
+      echo "  --version, -v                Show the version of this tool"
+      echo "  --help, -h                   Show this help message"
       exit 0
       ;;
     -*)
@@ -65,6 +89,8 @@ fi
 
 if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
   echo "🚫 Remote branch '$remote/$branch' doesn't exist!"
+  echo "💡 You may need to push this branch first:"
+  echo "    git push -u $remote $branch"
   exit 1
 fi
 
