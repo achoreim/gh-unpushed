@@ -22,6 +22,7 @@ gh unpushed [options] [remote]
 - `--remote, -r <remote>`: Override the default remote for this run
 - `--set-remote, -sr <remote>`: Set a new default remote for future runs
 - `--help, -h`: Show help message
+- `--version` : `-v` flag added, reads from `VERSION` file
 
 ### Examples
 Check unpushed commits to the default remote:
