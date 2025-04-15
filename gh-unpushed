@@ -43,27 +43,29 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     --help|-h)
-      echo "gh-unpushed - Show unpushed commits on your current Git branch"
-      echo ""
-      echo "Usage:"
-      echo "  gh unpushed [remote] [options]"
-      echo ""
-      echo "Description:"
-      echo "  Displays local commits that haven't been pushed to the specified remote."
-      echo "  If no remote is specified, it uses the default (typically 'origin')."
-      echo ""
-      echo "Examples:"
-      echo "  gh unpushed                  # Check unpushed commits to default remote"
-      echo "  gh unpushed upstream         # Use a specific remote"
-      echo "  gh unpushed -r upstream      # Same as above using --remote"
-      echo "  gh unpushed -sr upstream     # Set 'upstream' as new default"
-      echo "  gh unpushed -v               # Show tool version"
-      echo ""
-      echo "Options:"
-      echo "  --remote, -r <remote>        Override the remote for this run"
-      echo "  --set-remote, -sr <remote>   Set a new default remote"
-      echo "  --version, -v                Show the version of this tool"
-      echo "  --help, -h                   Show this help message"
+      cat <<EOF
+gh-unpushed - Show unpushed commits on your current Git branch
+
+Usage:
+  gh unpushed [remote] [options]
+
+Description:
+  Displays local commits that haven't been pushed to the specified remote.
+  If no remote is specified, it uses the default (typically 'origin').
+
+Examples:
+  gh unpushed                  # Check unpushed commits to default remote
+  gh unpushed upstream         # Use a specific remote
+  gh unpushed -r upstream      # Same as above using --remote
+  gh unpushed -sr upstream     # Set 'upstream' as new default
+  gh unpushed -v               # Show tool version
+
+Options:
+  --remote, -r <remote>        Override the remote for this run
+  --set-remote, -sr <remote>   Set a new default remote
+  --version, -v                Show the version of this tool
+  --help, -h                   Show this help message
+EOF
       exit 0
       ;;
     -*)
@@ -88,9 +90,11 @@ if [[ -z "$branch" ]]; then
 fi
 
 if ! git rev-parse --verify "$remote/$branch" &> /dev/null; then
-  echo "🚫 Remote branch '$remote/$branch' doesn't exist!"
-  echo "💡 You may need to push this branch first:"
-  echo "    git push -u $remote $branch"
+  cat <<EOF
+🚫 Remote branch '$remote/$branch' doesn't exist!
+💡 You may need to push this branch first:
+    git push -u $remote $branch
+EOF
   exit 1
 fi
 
@@ -102,8 +106,10 @@ unpushed=$(git log "$remote/$branch"..HEAD \
 if [[ -z "$unpushed" ]]; then
   echo "✅ No unpushed commits on '$branch' compared to '$remote'."
 else
-  echo "🚀 Unpushed commits on '$branch' (not yet pushed to '$remote/$branch'):"
-  echo ""
-  echo "$unpushed"
-  echo ""
+  cat <<EOF
+🚀 Unpushed commits on '$branch' (not yet pushed to '$remote/$branch'):
+
+$unpushed
+
+EOF
 fi
